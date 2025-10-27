@@ -234,15 +234,49 @@ struct StudyScreen: View {
         .onAppear {
             generateQuestions()
         }
-        .alert("Result", isPresented: $showAlert) {
-            //add image here
-            Button("Next") {
-                currentQuestionIndex += 1
-                showAlert = false
-            }
-        } message: {
-            Text(alertMessage)
-        }
+        .overlay(
+                    Group {
+                        if showAlert {
+                            ZStack {
+                                Color.black.opacity(0.4)
+                                    .edgesIgnoringSafeArea(.all)
+                                
+                                VStack(spacing: 20) {
+                                    if isCorrect {
+                                        Image("LoganThumbsUp")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 120, height: 120)
+                                            .cornerRadius(15)
+                                    }
+                                    
+                                    Text(alertMessage)
+                                        .font(.headline)
+                                        .multilineTextAlignment(.center)
+                                        .padding()
+                                    
+                                    Button(action: {
+                                        currentQuestionIndex += 1
+                                        showAlert = false
+                                    }) {
+                                        Text("Next")
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 50)
+                                            .background(Color.blue)
+                                            .cornerRadius(10)
+                                    }
+                                }
+                                .padding(30)
+                                .background(Color.white)
+                                .cornerRadius(20)
+                                .shadow(radius: 20)
+                                .padding(40)
+                            }
+                        }
+                    }
+                )
     }
     
     private func generateQuestions() {
@@ -306,6 +340,9 @@ struct StudyScreen: View {
     private func handleAnswer(index: Int, question: Question) {
         let selectedAnswer = question.options[index]
         let correct = selectedAnswer == question.correctAnswer
+        
+        // Set isCorrect state
+        isCorrect = correct
         
         if correct {
             score += 1
