@@ -145,13 +145,24 @@ struct StudyScreen: View {
                             // Question Content
                             if question.type != .polarities {
                                 // Show structure image
-                                Image(systemName: "photo")
-                                    .font(.system(size: 60))
-                                    .foregroundColor(.gray)
-                                    .frame(height: 150)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Color(.systemGray5))
-                                    .cornerRadius(10)
+                                let imageName = question.aminoAcidName?.replacingOccurrences(of: " ", with: "_") ?? ""
+                                if let uiImage = UIImage(named: imageName) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(maxHeight: 250)
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color(.systemGray5))
+                                        .cornerRadius(10)
+                                } else {
+                                    Image(systemName: "photo")
+                                        .font(.system(size: 60))
+                                        .foregroundColor(.gray)
+                                        .frame(height: 150)
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color(.systemGray5))
+                                        .cornerRadius(10)
+                                }
                             }
                             
                             // Question Text
@@ -160,7 +171,7 @@ struct StudyScreen: View {
                                     .font(.headline)
                                     .multilineTextAlignment(.center)
                                 
-                                if let aminoAcidName = question.aminoAcidName {
+                                if let aminoAcidName = question.aminoAcidName, question.type != .structures {
                                     Text(aminoAcidName)
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
@@ -224,6 +235,7 @@ struct StudyScreen: View {
             generateQuestions()
         }
         .alert("Result", isPresented: $showAlert) {
+            //add image here
             Button("Next") {
                 currentQuestionIndex += 1
                 showAlert = false
@@ -245,7 +257,7 @@ struct StudyScreen: View {
                     generatedQuestions.append(Question(
                         type: .structures,
                         questionText: "What amino acid is this?",
-                        aminoAcidName: nil,
+                        aminoAcidName: amino.name,
                         correctAnswer: amino.name,
                         options: options
                     ))
